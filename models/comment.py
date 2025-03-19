@@ -2,6 +2,8 @@ from sqlalchemy import Column, String, Text, ForeignKey, TIMESTAMP, Integer
 from sqlalchemy.orm import relationship
 from datetime import datetime
 from database import Base
+from sqlalchemy.dialects.postgresql import UUID
+import uuid
 
 class Comment(Base):
     __tablename__ = "comments"
