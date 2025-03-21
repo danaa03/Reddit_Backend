@@ -8,7 +8,7 @@ import uuid
 class Comment(Base):
     __tablename__ = "comments"
 
-    id = Column(String, primary_key=True, index=True)
+    id = Column(String, primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
     post_id = Column(String, ForeignKey("posts.id"), nullable=False)
     user_id = Column(String, ForeignKey("users.id"), nullable=False)
     parent_comment_id = Column(String, ForeignKey("comments.id"), nullable=True)

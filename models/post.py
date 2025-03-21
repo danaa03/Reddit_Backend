@@ -2,11 +2,12 @@ from sqlalchemy import Column, String, Text, ForeignKey, TIMESTAMP, Integer
 from sqlalchemy.orm import relationship
 from datetime import datetime
 from database import Base
+import uuid
 
 class Post(Base):
     __tablename__ = "posts"
 
-    id = Column(String, primary_key=True, index=True)
+    id = Column(String, primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
     title = Column(String, nullable=False)
     content = Column(Text, nullable=True)
     image_url = Column(String, nullable=True)
