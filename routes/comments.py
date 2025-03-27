@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
 from models import Comment 
-from schemas import CommentCreate, CommentUpdate, CommentResponse
+from schemas.comment import CommentCreate, CommentUpdate, CommentResponse
 from database import get_db
 from utils.security import get_current_user
 

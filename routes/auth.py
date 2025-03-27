@@ -1,25 +1,24 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from schemas.auth import LoginRequest, TokenResponse
+from fastapi.security import OAuth2PasswordRequestForm
+from schemas.auth import TokenResponse
 from utils.security import verify_password, create_access_token, hash_password
 from sqlalchemy.orm import Session
 from schemas.user import UserCreate, UserResponse
 from models.user import User
 from database import get_db
+from utils.security import get_current_user
 
 router = APIRouter()
 
 @router.post("/login", response_model=TokenResponse)
-def login(request: LoginRequest, db: Session = Depends(get_db)):
+def login(request: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.email == request.username).first()
+    if not user or not verify_password(request.password, user.password):
+        raise HTTPException(status_code=401, detail="Invalid credentials")
 
-    existing_user = db.query(User).filter(User.email == request.email).first()
-    if not existing_user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
-
-    if not verify_password(request.password, existing_user.password):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect password")
-    token = create_access_token({"sub": existing_user.email})
-
+    token = create_access_token({"sub": user.email})
     return {"access_token": token, "token_type": "bearer"}
+
 
 
 @router.post("/signup", response_model=UserResponse)
@@ -37,10 +36,12 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
-
-    token = create_access_token({"user_id": new_user.email})
     
-    return {"username": user.username, "email": user.email, "access_token": token, "token_type": "bearer"}
+    return {"username": user.username, "email": user.email}
+
+@router.get("/me", response_model=UserResponse)
+def get_profile(current_user: User = Depends(get_current_user)):
+    return current_user
 
 @router.post("/logout")
 def logout():

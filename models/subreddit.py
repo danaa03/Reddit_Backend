@@ -17,8 +17,8 @@ class Subreddit(Base):
     #one subreddit has many posts
     posts = relationship("Post", back_populates="subreddit", cascade="all, delete-orphan")  
 
-    # Many-to-Many Relationship with User
+    # many to many
     user_subreddits = relationship("UserSubreddit", back_populates="subreddit")
 
-    # One-to-Many: A subreddit is created by one user
+    #one to many
     creator = relationship("User", back_populates="created_subreddits")
