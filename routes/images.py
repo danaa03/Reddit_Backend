@@ -1,27 +1,14 @@
-from fastapi import File, UploadFile, APIRouter, HTTPException
-from typing import List
-import uuid
+from fastapi import APIRouter, HTTPException
+from fastapi.responses import FileResponse
 import os
 
 IMAGEDIR = "images/"
-
 router = APIRouter()
 
-@router.post("/upload-image")
-async def upload_image(files: List[UploadFile] = File(...)):
-    contents = []
-    if files:
-        print("images uploaded...fk")
-    try:
-        for file in files:
-            file.filename = f"{uuid.uuid4()}.jpg"
-            contents = await file.read()
-
-            if not os.path.exists(f"{IMAGEDIR}"):  
-                os.makedirs(f"{IMAGEDIR}") 
-            with open(f"{IMAGEDIR}{file.filename}", "wb") as f:
-                f.write(contents)
-        
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
-    return {"filenames": files}
+@router.get("/{file_path}")
+async def return_image(file_path: str):
+    print(os.path.exists(os.path.join(IMAGEDIR, file_path)))
+    full_path = os.path.join(IMAGEDIR, file_path)
+    if not os.path.exists(full_path):
+        raise HTTPException(status_code=404, detail="File not found")
+    return FileResponse(full_path)

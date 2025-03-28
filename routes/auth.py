@@ -19,11 +19,9 @@ def login(request: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(
     token = create_access_token({"sub": user.email})
     return {"access_token": token, "token_type": "bearer"}
 
-
-
 @router.post("/signup", response_model=UserResponse)
 def register_user(user: UserCreate, db: Session = Depends(get_db)):
-   
+    print(user.dict())
     existing_user = db.query(User).filter(User.email == user.email).first()
     if existing_user:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email already registered")
