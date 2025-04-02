@@ -8,7 +8,7 @@ from utils.security import get_current_user
 
 router = APIRouter()
 
-@router.post("/", response_model=CommentResponse)
+@router.post("/create-comment", response_model=CommentResponse)
 def create_comment(
     comment: CommentCreate,
     db: Session = Depends(get_db),
@@ -27,7 +27,7 @@ def create_comment(
 
 @router.get("/post/{post_id}", response_model=List[CommentResponse])
 def get_comments_by_post(post_id: str, db: Session = Depends(get_db)):
-    comments = db.query(Comment).filter(Comment.post_id == post_id).all()
+    comments = db.query(Comment).filter(Comment.post_id == post_id).order_by(Comment.created_at.desc()).all()
     return comments
 
 @router.put("/{comment_id}", response_model=CommentResponse)

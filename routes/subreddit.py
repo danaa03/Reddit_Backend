@@ -52,15 +52,23 @@ def get_most_recent_post(db: Session = Depends(get_db)):
             posts.append(post)
     return {"posts": posts}
 
-@router.get("/{subreddit_name}")
-def get_subreddit_posts_by_name(subreddit_name: str, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    """Retrieve all posts from a specific subreddit, but user must be authenticated."""
-    subreddit = db.query(Subreddit).filter(Subreddit.name == subreddit_name).first()
+@router.get("/{subreddit_id}")
+def get_subreddit_posts_by_id(subreddit_id: str, db: Session = Depends(get_db)):
+    """Retrieve the latest 50 posts from a subreddit, ordered by creation time."""
+    subreddit = db.query(Subreddit).filter(Subreddit.id == subreddit_id).first()
     if not subreddit:
         raise HTTPException(status_code=404, detail="Subreddit not found")
 
-    posts = db.query(Post).filter(Post.subreddit_id == subreddit.id).all()
-    return {"subreddit": subreddit_name, "posts": posts}
+    posts = (
+        db.query(Post)
+        .filter(Post.subreddit_id == subreddit.id)
+        .order_by(Post.created_at.desc())  
+        .limit(50)
+        .all()
+    )
+
+    return {"subreddit": subreddit_id, "posts": posts}
+
 
 @router.post("/create-subreddit")
 def create_subreddit(
@@ -137,6 +145,16 @@ def change_subreddit_description(
     return subreddit
     
 @router.get("/search/{subreddit_name}")
+def get_subreddit(subreddit_name: str, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Retrieve all posts from a specific subreddit, but user must be authenticated."""
+    subreddit = db.query(Subreddit).filter(Subreddit.name == subreddit_name).first()
+    if not subreddit:
+        raise HTTPException(status_code=404, detail="Subreddit not found")
+
+    posts = db.query(Post).filter(Post.subreddit_id == subreddit.id).all()
+    return {"subreddit": subreddit_name, "posts": posts}
+
+@router.get("/user-status")
 def get_subreddit(subreddit_name: str, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     """Retrieve all posts from a specific subreddit, but user must be authenticated."""
     subreddit = db.query(Subreddit).filter(Subreddit.name == subreddit_name).first()

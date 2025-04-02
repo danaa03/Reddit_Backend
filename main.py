@@ -7,9 +7,10 @@ from fastapi.openapi.utils import get_openapi
 from routes import auth
 from routes import subreddit
 from routes import images
-# from routes import comments
 from routes import posts
+from routes import comments
 from routes import votes
+from routes import user
 import uvicorn
 
 app = FastAPI(title="Reddit Clone API", description="API for a Reddit clone", version="0.1")
@@ -55,7 +56,8 @@ app.add_middleware(
 app.include_router(auth.router, prefix="/auth", tags=["Auth"])
 app.include_router(subreddit.router, prefix="/subreddit", tags=["SubReddit"])
 app.include_router(posts.router, prefix="/posts", tags=["Posts"])
-# app.include_router(comments.router, prefix="/comments", tags=["Comments"])
+app.include_router(comments.router, prefix="/comments", tags=["Comments"])
+app.include_router(user.router, prefix="/user", tags=["User"])
 app.include_router(votes.router, prefix="/votes", tags=["Votes"])
 app.include_router(images.router, prefix="/images", tags=["Images"])
 

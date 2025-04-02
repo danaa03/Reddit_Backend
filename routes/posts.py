@@ -19,6 +19,12 @@ def get_my_posts(user: User = Depends(get_current_user), db: Session = Depends(g
     posts = db.query(Post).filter(Post.user_id == user.id).all()
     return {"user": user.username, "posts": posts}
 
+@router.get("/{post_id}")
+def get_my_posts(post_id:str, db: Session = Depends(get_db)):
+    """Get the requested post."""
+    post = db.query(Post).filter(Post.id == post_id).first()
+    return {"post": post}
+
 # @router.post("/upload-image")
 # async def upload_image(files: List[UploadFile] = File(None)):
 #     attachments = []
@@ -38,14 +44,13 @@ def get_my_posts(user: User = Depends(get_current_user), db: Session = Depends(g
 
 @router.post("/create-post")
 async def create_post(
+    user: User = Depends(get_current_user),
     title: str = Form(...),
     content: Optional[str] = Form(None),
     subreddit_id: str = Form(...),
     files: List[UploadFile] = File(None),
     db: Session = Depends(get_db)
 ):
-    user_id = "6d81a0f3-f183-4b75-8b39-e166612e29db"
-    """Create a new post."""
     image_urls = []
     contents = []
     if files:
@@ -67,7 +72,7 @@ async def create_post(
     new_post = Post(
         title=title,
         content=content,
-        user_id=user_id,
+        user_id=user.id,
         image_url=",".join(image_urls) if image_urls else None,
         subreddit_id=subreddit_id,
     )
@@ -75,5 +80,22 @@ async def create_post(
     db.commit()
     db.refresh(new_post)
     return new_post
+
+# @router.post("/delete-post")
+# async def delete_post(post_id: str, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+   
+#     try:
+#         post = Post.query.filter(Post.id==post_id).first()
+
+#     except Exception as e:
+#             raise HTTPException(status_code=500, detail=f"Post not found: {str(e)}")
+
+#     if post:
+#         if post.user_id == user.id:
+#             db.delete(post)
+#             db.commit()
+#         else: raise HTTPException(status_code=500, detail=f": {str(e)}")
+#     return "Post uploaded succesfully"
+
 
 

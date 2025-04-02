@@ -14,6 +14,8 @@ class CommentResponse(BaseModel):
     id: str
     post_id: str
     user_id: str
+    upvotes: int
+    downvotes: int
     parent_comment_id: Optional[str]
     content: str
     created_at: datetime
