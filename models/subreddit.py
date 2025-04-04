@@ -14,11 +14,7 @@ class Subreddit(Base):
     status = Column(Enum("public", "private", name="subreddit_status"), default="public")
     created_by = Column(String, ForeignKey("users.id"), nullable=False)
     created_at = Column(TIMESTAMP, default=datetime.utcnow)
-    #one subreddit has many posts
+
     posts = relationship("Post", back_populates="subreddit", cascade="all, delete-orphan")  
-
-    # many to many
-    user_subreddits = relationship("UserSubreddit", back_populates="subreddit")
-
-    #one to many
+    user_subreddits = relationship("UserSubreddit", back_populates="subreddit", cascade="all, delete-orphan")
     creator = relationship("User", back_populates="created_subreddits")

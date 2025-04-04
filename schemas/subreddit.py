@@ -28,3 +28,6 @@ class SubredditUpdateStatus(BaseModel):
 class SubredditUpdateDescription(BaseModel):
     description: str
     subreddit_id: str
+
+class FollowSubreddit(BaseModel):
+    subreddit_id: str

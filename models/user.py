@@ -15,6 +15,7 @@ class User(Base):
     password = Column(String, nullable=False)
     karma = Column(Integer, default=0)
     created_at = Column(TIMESTAMP, default=datetime.utcnow)
+    role = Column(String, default='user') 
 
     posts = relationship("Post", back_populates="user")
     comments = relationship("Comment", back_populates="user")

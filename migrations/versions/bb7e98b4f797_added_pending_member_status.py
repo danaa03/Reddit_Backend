@@ -1,8 +1,8 @@
-"""Fixed many-to-many relationship between User and Subreddit3
+"""added pending member status
 
-Revision ID: 5c671cf7368b
-Revises: b7bed61625b6
-Create Date: 2025-03-19 18:26:50.131987
+Revision ID: bb7e98b4f797
+Revises: 7e8c8d87ad4f
+Create Date: 2025-04-04 01:57:01.445520
 
 """
 from typing import Sequence, Union
@@ -12,8 +12,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '5c671cf7368b'
-down_revision: Union[str, None] = 'b7bed61625b6'
+revision: str = 'bb7e98b4f797'
+down_revision: Union[str, None] = '7e8c8d87ad4f'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 

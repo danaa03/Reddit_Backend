@@ -2,6 +2,7 @@ from fastapi import Depends, APIRouter, HTTPException, File, UploadFile, Body, F
 from typing import List, Optional
 from sqlalchemy.orm import Session
 from models import Post
+from schemas.post import PostResponse
 from utils.security import get_current_user
 from models import User
 import uuid
@@ -14,10 +15,13 @@ router = APIRouter()
 IMAGEDIR = "images/"
 
 @router.get("/my-posts")
-def get_my_posts(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+def get_my_posts(user: User = Depends(get_current_user), db: Session = Depends(get_db), response_model=List[PostResponse]):
     """Get all posts of the authenticated user."""
-    posts = db.query(Post).filter(Post.user_id == user.id).all()
-    return {"user": user.username, "posts": posts}
+    try:
+        posts = db.query(Post).filter(Post.user_id == user.id).all()
+        return posts
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
 
 @router.get("/{post_id}")
 def get_my_posts(post_id:str, db: Session = Depends(get_db)):

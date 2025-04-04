@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from fastapi.openapi.utils import get_openapi
 from routes import auth
 from routes import subreddit
+from routes import admin
 from routes import images
 from routes import posts
 from routes import comments
@@ -60,6 +61,7 @@ app.include_router(comments.router, prefix="/comments", tags=["Comments"])
 app.include_router(user.router, prefix="/user", tags=["User"])
 app.include_router(votes.router, prefix="/votes", tags=["Votes"])
 app.include_router(images.router, prefix="/images", tags=["Images"])
+app.include_router(admin.router, prefix="/admin", tags=["Admin"])
 
 @app.get("/ping")
 def ping(db: Session = Depends(get_db)):
