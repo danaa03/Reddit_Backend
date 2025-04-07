@@ -1,5 +1,6 @@
 from fastapi import Depends, APIRouter, HTTPException, File, UploadFile, Body, Form
 from typing import List, Optional
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from models import Post
 from schemas.post import PostResponse
@@ -15,7 +16,7 @@ router = APIRouter()
 IMAGEDIR = "images/"
 
 @router.get("/my-posts")
-def get_my_posts(user: User = Depends(get_current_user), db: Session = Depends(get_db), response_model=List[PostResponse]):
+def get_all_my_posts(user: User = Depends(get_current_user), db: Session = Depends(get_db), response_model=List[PostResponse]):
     """Get all posts of the authenticated user."""
     try:
         posts = db.query(Post).filter(Post.user_id == user.id).all()
@@ -23,10 +24,31 @@ def get_my_posts(user: User = Depends(get_current_user), db: Session = Depends(g
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
 
+@router.delete("/delete-post/{post_id}")
+async def delete_post(
+    post_id: str,  
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    post = db.query(Post).filter(Post.id == post_id).first()
+
+    if not post:
+        raise HTTPException(status_code=404, detail="Post not found")
+
+    try:
+        db.delete(post)
+        db.commit()
+        return JSONResponse(content={"detail": "Post deleted successfully."})
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail="An error occurred while deleting the post")
+
+
 @router.get("/{post_id}")
-def get_my_posts(post_id:str, db: Session = Depends(get_db)):
+async def get_my_posts(post_id:str, db: Session = Depends(get_db)):
     """Get the requested post."""
     post = db.query(Post).filter(Post.id == post_id).first()
+    print("RETURNING: ", post)
     return {"post": post}
 
 # @router.post("/upload-image")

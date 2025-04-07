@@ -42,13 +42,14 @@ def toggle_follow(
     membership = db.query(UserSubreddit).filter(
         UserSubreddit.user_id == user.id, 
         UserSubreddit.subreddit_id == request.subreddit_id
-    ).first()
+    ).first() #check if the user is already a member of the subreddit
 
+    #is the subreddit public or private -> not catering to this rn
     subreddit_status = db.query(Subreddit).filter(Subreddit.id==request.subreddit_id).first()
 
     if membership:
         if membership.role == "moderator":
-            return HTTPException(status_code=403, detail="Moderators cannot unfollow the subreddit.")
+            raise HTTPException(status_code=403, detail="Moderators cannot unfollow the subreddit.")
         else:
             db.delete(membership)
             db.commit()
@@ -288,7 +289,7 @@ def change_subreddit_description(
 #     return {"subreddit": subreddit_name, "posts": posts}
 
 @router.get("/user-status")
-def get_subreddit(subreddit_name: str, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+def get_user_status(subreddit_name: str, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     """Retrieve all posts from a specific subreddit, but user must be authenticated."""
     subreddit = db.query(Subreddit).filter(Subreddit.name == subreddit_name).first()
     if not subreddit:
@@ -296,6 +297,15 @@ def get_subreddit(subreddit_name: str, user: User = Depends(get_current_user), d
 
     posts = db.query(Post).filter(Post.subreddit_id == subreddit.id).all()
     return {"subreddit": subreddit_name, "posts": posts}
+
+@router.get("/of-mod")
+def get_subreddit(user: User = Depends(get_current_user), db: Session = Depends(get_db), response_model=List[SubredditResponse]):
+    """Retrieve all the subreddits created by the authenticated user."""
+    subreddit = db.query(Subreddit).filter(Subreddit.created_by == user.id).all()
+    if not subreddit:
+        return []
+
+    return {subreddit}
 
 @router.get("/details-by-id/{id}")
 def get_subreddit_name_by_id(id: str, db: Session = Depends(get_db)):

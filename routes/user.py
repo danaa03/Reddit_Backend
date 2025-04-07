@@ -5,7 +5,7 @@ from database import get_db
 router = APIRouter()
 
 @router.get("/get-username-by-id/{user_id}")
-def get_my_posts(user_id: str, db: Session = Depends(get_db)):
+def get_username_by_id(user_id: str, db: Session = Depends(get_db)):
     """Get username, given user id."""
     user = db.query(User).filter(User.id == user_id).first()
     if user:

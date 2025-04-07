@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from models import Vote, Post, Comment
-from schemas.vote import VoteCreate
+from schemas.vote import VoteCreate, CheckVote
 from database import get_db
 from utils.security import get_current_user
 
@@ -65,3 +65,18 @@ def vote(vote: VoteCreate, db: Session = Depends(get_db), user=Depends(get_curre
 
     db.commit()
     return {"message": "voted successfully"}
+
+@router.get("/check-vote-on-post/{post_id}")  # will check if current user has already voted on this post/comment and if yes then it will return the vote_type 
+def vote(post_id:str, db: Session = Depends(get_db), user=Depends(get_current_user)):
+    try:
+        existing_vote = db.query(Vote).filter_by(
+            user_id=user.id,
+            post_id=post_id,
+        ).first()
+        if existing_vote:
+            return {"vote_type": existing_vote.vote_type}
+        else:
+            return {"message": "no vote found"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
+    return

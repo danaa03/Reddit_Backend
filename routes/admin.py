@@ -12,7 +12,6 @@ from models.user import User
 from models.post import Post
 from models.subreddit import Subreddit
 from models.comment import Comment
-# from models.user_subreddit import UserSubreddit
 
 router = APIRouter()
 
