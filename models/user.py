@@ -24,8 +24,5 @@ class User(Base):
     messages_received = relationship("DirectMessage", foreign_keys="DirectMessage.receiver_id")
     notifications = relationship("Notification", back_populates="user")
 
-    # Many-to-Many Relationship with Subreddit
     user_subreddits = relationship("UserSubreddit", back_populates="user")
-
-    # One-to-Many: A user can create multiple subreddits
     created_subreddits = relationship("Subreddit", back_populates="creator")

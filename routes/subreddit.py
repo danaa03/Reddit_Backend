@@ -59,11 +59,6 @@ def toggle_follow(
             db.add(new_follow)
             db.commit()
             return {"message": "Followed", "status": "member"}
-        # else:
-        #     new_follow = UserSubreddit(user_id=user.id, subreddit_id=request.subreddit_id, role="pending")
-        #     db.add(new_follow)
-        #     db.commit()
-        #     return {"message": "Followed", "status": "pending"}
 
 @router.get("/membership-status/{subreddit_id}")
 def get_membership_status(
@@ -86,7 +81,6 @@ def get_most_recent_post_joined(
     """
     Retrieve the most recent posts from the top six subreddits the user has joined.
     """
-    # subreddit_ids = []
     posts = []
 
     if user:
@@ -104,22 +98,6 @@ def get_most_recent_post_joined(
                     "posts": []
             }
 
-        # subreddit_hits = (
-        #     db.query(
-        #         Subreddit.id
-        #     )
-        #     .join(Post, Post.subreddit_id == Subreddit.id)
-        #     .filter(Subreddit.id.in_([sub.id for sub in joined_subreddits]))
-        #     .group_by(Subreddit.id)
-        #     .order_by(func.sum(Post.upvotes + Post.downvotes).desc())
-        #     .limit(6)
-        #     .all()
-        # )
-
-        # subreddit_ids = [sub.id for sub in subreddit_hits]
-
-        # if not subreddit_ids:
-        #     raise HTTPException(status_code=404, detail="No posts found in the user's joined subreddits")
         empty_joined = []
         for subreddit in joined_subreddits:
             post = (
@@ -277,16 +255,6 @@ def change_subreddit_description(
     db.commit()
     db.refresh(subreddit)
     return subreddit
-    
-# @router.get("/search/{subreddit_name}")
-# def get_subreddit(subreddit_name: str, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-#     """Retrieve all posts from a specific subreddit, but user must be authenticated."""
-#     subreddit = db.query(Subreddit).filter(Subreddit.name == subreddit_name).first()
-#     if not subreddit:
-#         raise HTTPException(status_code=404, detail="Subreddit not found")
-
-#     posts = db.query(Post).filter(Post.subreddit_id == subreddit.id).all()
-#     return {"subreddit": subreddit_name, "posts": posts}
 
 @router.get("/user-status")
 def get_user_status(subreddit_name: str, user: User = Depends(get_current_user), db: Session = Depends(get_db)):

@@ -51,23 +51,6 @@ async def get_my_posts(post_id:str, db: Session = Depends(get_db)):
     print("RETURNING: ", post)
     return {"post": post}
 
-# @router.post("/upload-image")
-# async def upload_image(files: List[UploadFile] = File(None)):
-#     attachments = []
-#     try:
-#         for file in files:
-#             file.filename = f"{uuid.uuid4()}.jpg"
-#             contents = await file.read()
-
-#             if not os.path.exists(f"{IMAGEDIR}"):  
-#                 os.makedirs(f"{IMAGEDIR}") 
-#             with open(f"{IMAGEDIR}{file.filename}", "wb") as f:
-#                 f.write(contents)
-        
-#     except Exception as e:
-#         raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
-#     return {"filenames": files}
-
 @router.post("/create-post")
 async def create_post(
     user: User = Depends(get_current_user),
@@ -106,22 +89,5 @@ async def create_post(
     db.commit()
     db.refresh(new_post)
     return new_post
-
-# @router.post("/delete-post")
-# async def delete_post(post_id: str, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-   
-#     try:
-#         post = Post.query.filter(Post.id==post_id).first()
-
-#     except Exception as e:
-#             raise HTTPException(status_code=500, detail=f"Post not found: {str(e)}")
-
-#     if post:
-#         if post.user_id == user.id:
-#             db.delete(post)
-#             db.commit()
-#         else: raise HTTPException(status_code=500, detail=f": {str(e)}")
-#     return "Post uploaded succesfully"
-
 
 
